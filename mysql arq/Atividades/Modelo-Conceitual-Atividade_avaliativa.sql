@@ -72,10 +72,11 @@ ALTER TABLE Projeto
     ADD Ccod INT,
     ADD FOREIGN KEY (Ccod) REFERENCES Cidade(Ccod);
 
+-- drop da tabela instituição
+drop table Instituicao;
 
 
 -- INSERINDO ÍNDICES NO CAMPOS IMPORTANTES
-
 CREATE INDEX idx_fornecedor_nome ON Fornecedor(Fnome);
 CREATE INDEX idx_peca_nome ON Peca(Pnome);
 CREATE INDEX idx_projeto_nome ON Projeto(PRnome);
