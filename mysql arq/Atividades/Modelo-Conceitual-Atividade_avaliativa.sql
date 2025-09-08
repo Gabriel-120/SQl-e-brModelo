@@ -1,12 +1,13 @@
 -- Criação inicial
 
 CREATE DATABASE Atividade_Avaliativa_1;
-USE AtividadeBD;
+USE Atividade_Avaliativa_1;
+
 
 CREATE TABLE Fornecedor (
     Fcodigo INT PRIMARY KEY,
     Fnome VARCHAR(100) NOT NULL,
-    Status VARCHAR(20) DEFAULT 'Ativo',
+    FStatus VARCHAR(20) DEFAULT'Ativo',
     Cidade VARCHAR(100)
 );
 
@@ -85,3 +86,23 @@ CREATE INDEX idx_projeto_nome ON Projeto(PRnome);
 CREATE INDEX idx_fornecedor_ccod ON Fornecedor(Ccod);
 CREATE INDEX idx_peca_ccod ON Peca(Ccod);
 CREATE INDEX idx_projeto_ccod ON Projeto(Ccod);
+
+
+-- inserindo dados
+-- tabela cidade
+insert into Cidade value ('11','Limeira', 'SP');
+insert into Cidade value ('12','São Paulo','SP');
+insert into Cidade value ('13','Campinas','SP');
+
+-- tabela fornecedor
+insert into Fornecedor value (01, 'Kalunga', '', '(19) 99999-9999', '11');
+insert into Fornecedor value (02, 'LLC Logistica', 'Inativo', '(19) 99999-9999', '11');
+
+-- tabela pecas
+insert into Peca value ('01','Porca','Preto','1','11');
+insert into Peca value ('02','Parafuso','Prata','5','11');
+
+
+select * from Cidade;
+select * from Fornecedor;
+select * from Peca;
