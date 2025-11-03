@@ -155,8 +155,7 @@ limit 3;
 -- Desafios Extras
 CREATE INDEX idx_alunos_email ON Alunos (Email);
 
-
--- select * from Alunos;
+select * from Alunos;
 -- select * from Curso;
 -- select * from Inscricao;
 -- select * from Avaliacao;

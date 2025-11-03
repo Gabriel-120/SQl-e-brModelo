@@ -16,7 +16,7 @@ $result = $conn->query("SELECT * FROM Alunos");
             <th>Nome</th>
             <th>Email</th>
             <th>Data de Nascimento</th>
-            <th>Ações</th>
+            <th>Ações</th> 
         </tr>
         <?php while ($row = $result->fetch_assoc()) { ?>
             <tr>
@@ -24,7 +24,8 @@ $result = $conn->query("SELECT * FROM Alunos");
                 <td><?php echo $row['Nome']; ?></td>
                 <td><?php echo $row['Email']; ?></td>
                 <td><?php echo $row['Data_nascimento']; ?></td>
-                <td><a href='editar.php?Cod_aluno=<?php echo $row['Cod_aluno']; ?>'>Editar</a></td>
+                <td><a href='editar.php?Cod_aluno=<?php echo $row['Cod_aluno']; ?>'>Editar</a> /
+                <a href='delete.php?Cod_aluno=<?php echo $row['Cod_aluno']; ?>'>Deletar</a></td>
             </tr>
         <?php } ?>
     </table>
