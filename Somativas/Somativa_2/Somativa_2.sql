@@ -1,5 +1,3 @@
--- Geração de Modelo físico
--- Sql ANSI 2003 - brModelo.
 create database somativa_2;
 use somativa_2;
 select somativa_2;
@@ -35,7 +33,7 @@ CEP varchar(9) not null,
 Nome varchar(100) not null,
 N_endereco varchar(10) not null,
 Celular varchar(15) not null ,
-Email vrchar(150) not null
+Email varchar(150) not null
 );
 
 CREATE TABLE OS (
