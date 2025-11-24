@@ -1,7 +1,7 @@
 <?php
 $conn = new mysqli('localhost', 'root', 'senaisp', 'Somativa_2');
 
-$id = $_POST['Id_cliente'];
+$id = $_POST['id'];
 $nome = $_POST['nome'];
 $cpf = $_POST['cpf'];
 $email = $_POST['email'];
@@ -19,4 +19,3 @@ if ($conn->query($sql) === TRUE) {
 }
 
 $conn->close();
-?>
