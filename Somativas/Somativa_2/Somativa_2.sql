@@ -35,9 +35,17 @@ Celular varchar(15) not null ,
 Email varchar(150) not null
 );
 
+CREATE TABLE Estoque (
+Qtde int not null,
+Preco decimal(5,2) not null,
+Id_item int auto_increment primary key PRIMARY KEY,
+Nome varchar(150) not null,
+Descricao varchar(255) not null
+);
+
 CREATE TABLE OS (
 Descricao varchar(255) not null,
-Id_servico int auto_increment primary key PRIMARY KEY,
+Id_servico int auto_increment primary key,
 Data_inicio date,
 Servico varchar(100) not null,
 Data_termino date,
@@ -48,14 +56,6 @@ Id_item int,
 FOREIGN KEY(Id_carro) REFERENCES Carro (Id_carro),
 FOREIGN KEY(Id_mec) REFERENCES Mecanico (Id_mec),
 FOREIGN KEY(Id_item) REFERENCES Estoque (Id_item)
-);
-
-CREATE TABLE Estoque (
-Qtde int not null,
-Preco decimal(5,2) not null,
-Id_item int auto_increment primary key PRIMARY KEY,
-Nome varchar(150) not null,
-Descricao varchar(255) not null
 );
 
 -------- 1 --------
@@ -78,7 +78,7 @@ alter table OS add column Status_peca varchar(20) default 'Aguardando Peça';
 select * from OS where Status_peca = "Aguardando Peça";
 
 -- 1.5: Liste as peças (tabela Pecas) cujo estoque (qtd_estoque) está abaixo de 5 unidades.
-select * from Estoque where Quantidade < 5;
+select * from Estoque where Qtde < 5;
 
 -- 1.6: Escreva uma consulta para encontrar os veículos que já tiveram mais de uma Ordem de Serviço (retornaram à oficina) usando uma subconsulta correlacionada.
 
@@ -223,30 +223,107 @@ right join Carro c
 on c.Id_carro = o.Id_carro;
 
 
--------- 2 --------
+-------- 8 --------
+-- 8.1: Escreva uma consulta para encontrar os clientes que já abriram mais de 3 Ordens de Serviço.
+SELECT c.Nome 
+FROM Cliente c 
+JOIN Carro car 
+ON c.Id_cliente = car.Id_cliente 
+JOIN OS o 
+ON car.Id_carro = o.Id_carro 
+GROUP BY c.Nome 
+HAVING COUNT(o.Id_servico) > 3;
+
+-- 8.2: Identifique as peças (nome da peça) que foram utilizadas na mesma Ordem de Serviço do mecânico "Carlos" (ID 4).
+SELECT DISTINCT e.Nome 
+FROM Estoque e 
+JOIN OS o 
+ON e.Id_item = o.Id_item 
+WHERE o.Id_servico 
+IN (SELECT Id_servico 
+FROM OS 
+WHERE Id_mec = 4);
+
+-- 8.3: Liste os veículos (placa e modelo) que nunca tiveram uma Ordem de Serviço (use NOT IN ou NOT EXISTS).
+SELECT Placa, Modelo 
+FROM Carro 
+WHERE Id_carro 
+NOT IN (SELECT Id_carro FROM OS);
+
+-- Desafio: Encontre os serviços de "mão de obra" (tabela Servicos) cujo preco_mao_obra é maior que o preço médio de todos os serviços.
+SELECT Nome, Preco 
+FROM Estoque 
+WHERE Preco > (SELECT AVG(Preco) FROM Estoque);
 
 
+-------- 9.1 --------
+-- 9.1.1: Calcule o número total de veículos cadastrados na oficina.
+SELECT COUNT(*) AS TotalVeiculos 
+FROM Carro;
 
--------- 2 --------
+-- 9.1.2: Determine o valor total do inventário (estoque) (soma de qtd_estoque * preco_custo de todas as peças).
+SELECT SUM(Qtde * Preco_custo) AS ValorTotalInventario 
+FROM Estoque;
 
-
-
--------- 2 --------
-
-
-
--------- 2 --------
-
-
-
--------- 2 --------
+-- 9.1.3: Encontre o preço médio da mão de obra de todos os serviços (tabela Servicos).
+SELECT AVG(Preco) AS PrecoMedioItem FROM Estoque;
 
 
+-------- 9.2 --------
+-- 9.2.1: Agrupe os veículos por marca e conte quantos veículos de cada marca a oficina atende.
+SELECT Marca, COUNT(*) AS Quantidade 
+FROM Carro 
+GROUP BY Marca;
 
--------- 2 --------
+-- 9.2.2: Determine o número de Ordens de Serviço abertas por mês (agrupando por MONTH(data_abertura)).
+SELECT MONTH(Data_inicio) AS Mes, YEAR(Data_inicio) AS Ano, COUNT(*) AS TotalOS 
+FROM OS 
+GROUP BY YEAR(Data_inicio), MONTH(Data_inicio) 
+ORDER BY Ano, Mes;
+
+-- 9.2.3: Conte quantas OS cada status possui atualmente (agrupando por status).
+SELECT Status_os, COUNT(*) AS TotalOS 
+FROM OS 
+GROUP BY Status_os;
 
 
+-------- 9.3 --------
+-- 9.3.1: Calcule o número total de OS que estão com o status "Concluído".
+SELECT COUNT(*) AS TotalOSConcluidas FROM OS WHERE Status_os = 'Concluída';
 
--------- 2 --------
+-- 9.3.2: Determine o faturamento total (peças + serviços) apenas dos veículos da marca "Fiat" no último ano.
+SELECT COUNT(*) AS TotalOSConcluidas FROM OS WHERE Status_os = 'Concluída';
+
+-- 9.3.3: Encontre o preço médio da mão de obra apenas dos serviços na especialidade "Motor".
+ALTER TABLE OS
+ADD COLUMN Preco_mao_obra DECIMAL(7, 2) NOT NULL DEFAULT 0.00;
+
+SELECT AVG(o.Preco_mao_obra) AS PrecoMedioMaoDeObraMotor
+FROM OS o
+JOIN Mecanico m ON o.Id_mec = m.Id_mec
+WHERE m.Especialidade = 'Motor';
 
 
+-------- 9.4 --------
+-- 9.4.1: Encontre os id_cliente dos clientes que já gastaram (soma total em OS) mais de R$ 5.000,00 na oficina.
+SELECT c.Id_cliente, c.Nome, SUM(e.Preco * o.Qtde_pecas) AS GastoTotal FROM Cliente c JOIN Carro car ON c.Id_cliente = car.Id_cliente JOIN OS o ON car.Id_carro = o.Id_carro JOIN Estoque e ON o.Id_item = e.Id_item GROUP BY c.Id_cliente, c.Nome HAVING GastoTotal > 5000.00;
+
+-- 9.4.2: Liste as id_peca das peças que foram vendidas (em OS_Pecas) mais de 100 vezes no total (somando quantidade_usada).
+SELECT Id_item, SUM(Qtde_pecas) AS TotalVendido FROM OS GROUP BY Id_item HAVING TotalVendido > 100;
+
+-- 9.4.3: Encontre as especialidades dos mecânicos que (agrupadas por especialidade) trabalharam em mais de 20 Ordens de Serviço no total.
+SELECT m.Especialidade, COUNT(o.Id_servico) AS TotalOS FROM Mecanico m JOIN OS o ON m.Id_mec = o.Id_mec GROUP BY m.Especialidade HAVING TotalOS > 20;
+
+-- (Desafio - Todos de 9) Encontre o nome do mecânico que mais trabalhou em Ordens de Serviço (maior COUNT).
+SELECT m.Nome FROM Mecanico m JOIN OS o ON m.Id_mec = o.Id_mec GROUP BY m.Nome ORDER BY COUNT(o.Id_servico) DESC LIMIT 1;
+
+
+-------- 10 --------
+-- 10.1: Na tabela Veiculos, a coluna placa é frequentemente usada em consultas WHERE. Crie o índice na tabela
+CREATE INDEX idx_placa ON Carro (Placa);
+
+-- 10.2: Explique por que um JOIN entre Ordens_Servico e Veiculos (usando id_veiculo) é rápido. O que aconteceria com a performance se Ordens_Servico.id_veiculo (a chave estrangeira) não fosse indexada? Faça a indexação da chave estrangeira.
+CREATE INDEX idx_fk_id_carro ON OS (Id_carro);
+
+-- (Desafio) O que é um índice composto (ex: na chave primária de OS_Pecas (id_os, id_peca)) e por que ele é mais eficiente para consultas que filtram por id_os E id_peca?
+CREATE INDEX idx_os_peca_composto ON OS (Id_servico, Id_item);
